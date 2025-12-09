@@ -7,9 +7,9 @@ Chart.defaults.color = '#94A3B8';
 Chart.defaults.borderColor = 'rgba(148, 163, 184, 0.1)';
 
 const CHART_COLORS = {
-    primary: '#6366F1',
-    secondary: '#8B5CF6',
-    tertiary: '#EC4899',
+    primary: '#10B981',
+    secondary: '#34D399',
+    tertiary: '#6EE7B7',
     quaternary: '#14B8A6',
     quinary: '#F59E0B'
 };
