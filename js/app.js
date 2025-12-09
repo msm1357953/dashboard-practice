@@ -1,5 +1,5 @@
 /**
- * Main Application Entry Point
+ * Main Application Entry Point (API 연동 버전)
  */
 
 (function () {
@@ -16,23 +16,18 @@
     function updateKPICards(data) {
         const kpi = data.kpi;
 
-        // 노출수
         document.getElementById('kpiImpressions').textContent = DataUtils.formatNumber(kpi.impressions.value);
         updateChangeElement('kpiImpressionsChange', kpi.impressions.change);
 
-        // 클릭수
         document.getElementById('kpiClicks').textContent = DataUtils.formatNumber(kpi.clicks.value);
         updateChangeElement('kpiClicksChange', kpi.clicks.change);
 
-        // CTR
         document.getElementById('kpiCtr').textContent = DataUtils.formatPercent(kpi.ctr.value);
         updateChangeElement('kpiCtrChange', kpi.ctr.change);
 
-        // 비용
         document.getElementById('kpiCost').textContent = DataUtils.formatCurrency(kpi.cost.value);
         updateChangeElement('kpiCostChange', kpi.cost.change, true);
 
-        // ROAS
         document.getElementById('kpiRoas').textContent = kpi.roas.value.toFixed(0) + '%';
         updateChangeElement('kpiRoasChange', kpi.roas.change);
     }
@@ -48,9 +43,6 @@
         el.className = 'kpi-card__change ' + (displayPositive ? 'positive' : 'negative');
     }
 
-    /**
-     * 날짜 표시 업데이트
-     */
     function updateDatePeriod(days) {
         const end = new Date();
         const start = new Date();
@@ -61,13 +53,32 @@
     }
 
     /**
-     * 대시보드 초기화
+     * 대시보드 초기화 (비동기)
      */
-    function initDashboard() {
-        currentData = getAggregatedData(currentRange);
-        updateKPICards(currentData);
-        updateDatePeriod(currentRange);
-        updateAllCharts(currentData, { trendMetrics, campaignMetric });
+    async function initDashboard() {
+        try {
+            currentData = await getAggregatedData(currentRange);
+            updateKPICards(currentData);
+            updateDatePeriod(currentRange);
+            updateAllCharts(currentData, { trendMetrics, campaignMetric });
+        } catch (error) {
+            console.error('대시보드 초기화 실패:', error);
+            alert('서버 연결 실패. 서버가 실행 중인지 확인하세요.\n(node server.js)');
+        }
+    }
+
+    /**
+     * 데이터 새로고침 (비동기)
+     */
+    async function refreshData() {
+        try {
+            currentData = await getAggregatedData(currentRange);
+            updateKPICards(currentData);
+            updateDatePeriod(currentRange);
+            updateAllCharts(currentData, { trendMetrics, campaignMetric });
+        } catch (error) {
+            console.error('데이터 새로고침 실패:', error);
+        }
     }
 
     /**
@@ -76,14 +87,11 @@
     function setupEventListeners() {
         // 기간 필터 버튼
         document.querySelectorAll('.date-filter__btn').forEach(btn => {
-            btn.addEventListener('click', function () {
+            btn.addEventListener('click', async function () {
                 document.querySelectorAll('.date-filter__btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 currentRange = parseInt(this.dataset.range);
-                currentData = getAggregatedData(currentRange);
-                updateKPICards(currentData);
-                updateDatePeriod(currentRange);
-                updateAllCharts(currentData, { trendMetrics, campaignMetric });
+                await refreshData();
             });
         });
 
