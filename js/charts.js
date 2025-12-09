@@ -82,9 +82,13 @@ function createChannelChart(canvasId, data) {
     const centerEl = document.getElementById('channelCenter');
     if (centerEl) centerEl.querySelector('.doughnut-center__value').textContent = DataUtils.formatCurrency(totalCost);
 
+    // 동적 색상 생성 (color 컬럼이 없을 경우)
+    const dynamicColors = channels.map((_, i) => `hsl(${(i * 360 / channels.length + 220) % 360}, 70%, 55%)`);
+    const bgColors = channels.map((c, i) => c.color || dynamicColors[i]);
+
     chartInstances[canvasId] = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels: channels.map(c => c.name), datasets: [{ data: channels.map(c => c.cost), backgroundColor: channels.map(c => c.color), borderColor: 'rgba(15,23,42,0.8)', borderWidth: 3, hoverOffset: 8 }] },
+        data: { labels: channels.map(c => c.name), datasets: [{ data: channels.map(c => c.cost), backgroundColor: bgColors, borderColor: 'rgba(15,23,42,0.8)', borderWidth: 3, hoverOffset: 8 }] },
         options: {
             responsive: true, maintainAspectRatio: false, cutout: '70%',
             plugins: { legend: { position: 'right', labels: { padding: 16, usePointStyle: true } }, tooltip: { callbacks: { label: ctx => `${DataUtils.formatCurrency(ctx.raw)} (${((ctx.raw / totalCost) * 100).toFixed(1)}%)` } } }

@@ -43,13 +43,17 @@
         el.className = 'kpi-card__change ' + (displayPositive ? 'positive' : 'negative');
     }
 
-    function updateDatePeriod(days) {
-        const end = new Date();
-        const start = new Date();
-        start.setDate(end.getDate() - days + 1);
+    function updateDatePeriod(data) {
+        // API에서 반환된 일별 데이터의 실제 날짜 범위 사용
+        const daily = data.daily;
+        if (!daily || daily.length === 0) return;
 
-        const format = (d) => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-        document.getElementById('datePeriod').textContent = `${format(start)} - ${format(end)}`;
+        const startDate = daily[0].date;
+        const endDate = daily[daily.length - 1].date;
+
+        // YYYY-MM-DD -> YYYY.MM.DD 포맷 변환
+        const format = (dateStr) => dateStr.replace(/-/g, '.');
+        document.getElementById('datePeriod').textContent = `${format(startDate)} - ${format(endDate)}`;
     }
 
     /**
@@ -59,7 +63,7 @@
         try {
             currentData = await getAggregatedData(currentRange);
             updateKPICards(currentData);
-            updateDatePeriod(currentRange);
+            updateDatePeriod(currentData);
             updateAllCharts(currentData, { trendMetrics, campaignMetric });
         } catch (error) {
             console.error('대시보드 초기화 실패:', error);
@@ -74,7 +78,7 @@
         try {
             currentData = await getAggregatedData(currentRange);
             updateKPICards(currentData);
-            updateDatePeriod(currentRange);
+            updateDatePeriod(currentData);
             updateAllCharts(currentData, { trendMetrics, campaignMetric });
         } catch (error) {
             console.error('데이터 새로고침 실패:', error);

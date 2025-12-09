@@ -1,5 +1,6 @@
 /**
  * Express + SQLite Server for Ad Report Dashboard
+ * CSV 파일에서 데이터 로드
  */
 
 const express = require('express');
@@ -11,6 +12,7 @@ const fs = require('fs');
 const app = express();
 const PORT = 3000;
 const DB_PATH = path.join(__dirname, 'data', 'dashboard.db');
+const DATA_DIR = path.join(__dirname, 'data');
 
 let db = null;
 
@@ -20,28 +22,47 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 /**
- * DB 초기화 및 샘플 데이터 삽입
+ * CSV 파싱 헬퍼
+ */
+function parseCSV(filePath) {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = content.trim().split('\n');
+    const headers = lines[0].split(',');
+
+    return lines.slice(1).map(line => {
+        const values = line.split(',');
+        const obj = {};
+        headers.forEach((h, i) => {
+            const val = values[i];
+            // 숫자 변환 시도
+            obj[h.trim()] = isNaN(val) ? val : parseFloat(val);
+        });
+        return obj;
+    });
+}
+
+/**
+ * DB 초기화 - CSV에서 로드
  */
 async function initDatabase() {
     const SQL = await initSqlJs();
 
-    // 기존 DB 파일 로드 또는 새로 생성
-    const dataDir = path.join(__dirname, 'data');
-    if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
+    // CSV 파일 존재 확인
+    const dailyCSV = path.join(DATA_DIR, 'daily_summary.csv');
+    const channelCSV = path.join(DATA_DIR, 'channel_summary.csv');
+    const campaignCSV = path.join(DATA_DIR, 'campaign_summary.csv');
+
+    if (!fs.existsSync(dailyCSV)) {
+        console.error('❌ CSV 파일이 없습니다. python aggregate_data.py 를 먼저 실행하세요.');
+        process.exit(1);
     }
 
-    if (fs.existsSync(DB_PATH)) {
-        const buffer = fs.readFileSync(DB_PATH);
-        db = new SQL.Database(buffer);
-        console.log('기존 DB 로드됨');
-    } else {
-        db = new SQL.Database();
-        createTables();
-        insertSampleData();
-        saveDatabase();
-        console.log('새 DB 생성 및 샘플 데이터 삽입 완료');
-    }
+    // 항상 새 DB 생성 (CSV가 최신 소스)
+    db = new SQL.Database();
+    createTables();
+    loadFromCSV(dailyCSV, channelCSV, campaignCSV);
+    saveDatabase();
+    console.log('✅ CSV에서 DB 로드 완료');
 }
 
 function createTables() {
@@ -49,11 +70,12 @@ function createTables() {
         CREATE TABLE IF NOT EXISTS daily_stats (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT NOT NULL,
-            impressions INTEGER DEFAULT 0,
-            clicks INTEGER DEFAULT 0,
-            cost INTEGER DEFAULT 0,
-            conversions INTEGER DEFAULT 0,
-            revenue INTEGER DEFAULT 0
+            impressions REAL DEFAULT 0,
+            clicks REAL DEFAULT 0,
+            cost REAL DEFAULT 0,
+            conversions REAL DEFAULT 0,
+            revenue REAL DEFAULT 0,
+            app_installs REAL DEFAULT 0
         )
     `);
 
@@ -61,10 +83,11 @@ function createTables() {
         CREATE TABLE IF NOT EXISTS channels (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            cost INTEGER DEFAULT 0,
-            impressions INTEGER DEFAULT 0,
-            clicks INTEGER DEFAULT 0,
-            color TEXT
+            cost REAL DEFAULT 0,
+            impressions REAL DEFAULT 0,
+            clicks REAL DEFAULT 0,
+            revenue REAL DEFAULT 0,
+            conversions REAL DEFAULT 0
         )
     `);
 
@@ -72,60 +95,42 @@ function createTables() {
         CREATE TABLE IF NOT EXISTS campaigns (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            cost INTEGER DEFAULT 0,
-            clicks INTEGER DEFAULT 0,
-            conversions INTEGER DEFAULT 0,
-            roas INTEGER DEFAULT 0
+            cost REAL DEFAULT 0,
+            clicks REAL DEFAULT 0,
+            impressions REAL DEFAULT 0,
+            conversions REAL DEFAULT 0,
+            revenue REAL DEFAULT 0
         )
     `);
 }
 
-function insertSampleData() {
-    // 일별 데이터 (30일)
-    const dailyData = [];
-    const today = new Date();
-    for (let i = 29; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        const impressions = 200000 + Math.floor(Math.random() * 200000);
-        const clicks = Math.floor(impressions * (0.03 + Math.random() * 0.02));
-        const cost = 2500000 + Math.floor(Math.random() * 2500000);
-        const conversions = Math.floor(clicks * (0.015 + Math.random() * 0.01));
-        const revenue = conversions * (40000 + Math.floor(Math.random() * 40000));
-        dailyData.push([dateStr, impressions, clicks, cost, conversions, revenue]);
-    }
-
-    const stmtDaily = db.prepare(`INSERT INTO daily_stats (date, impressions, clicks, cost, conversions, revenue) VALUES (?, ?, ?, ?, ?, ?)`);
-    dailyData.forEach(row => stmtDaily.run(row));
+function loadFromCSV(dailyCSV, channelCSV, campaignCSV) {
+    // 일별 데이터
+    const dailyData = parseCSV(dailyCSV);
+    const stmtDaily = db.prepare(`INSERT INTO daily_stats (date, impressions, clicks, cost, conversions, revenue, app_installs) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+    dailyData.forEach(row => {
+        stmtDaily.run([row.date, row.impressions, row.clicks, row.cost, row.conversions, row.revenue, row.app_installs || 0]);
+    });
     stmtDaily.free();
+    console.log(`   - daily_stats: ${dailyData.length} rows`);
 
     // 채널 데이터
-    const channels = [
-        ['Google Ads', 22500000, 1850000, 58000, '#4285F4'],
-        ['Meta Ads', 18200000, 1420000, 48000, '#1877F2'],
-        ['Naver', 8500000, 680000, 22000, '#03C75A'],
-        ['Kakao', 5200000, 420000, 14000, '#FEE500'],
-        ['TikTok', 3980000, 310000, 10600, '#000000']
-    ];
-
-    const stmtChannel = db.prepare(`INSERT INTO channels (name, cost, impressions, clicks, color) VALUES (?, ?, ?, ?, ?)`);
-    channels.forEach(row => stmtChannel.run(row));
+    const channelData = parseCSV(channelCSV);
+    const stmtChannel = db.prepare(`INSERT INTO channels (name, cost, impressions, clicks, revenue, conversions) VALUES (?, ?, ?, ?, ?, ?)`);
+    channelData.forEach(row => {
+        stmtChannel.run([row.name, row.cost, row.impressions, row.clicks, row.revenue, row.conversions]);
+    });
     stmtChannel.free();
+    console.log(`   - channels: ${channelData.length} rows`);
 
     // 캠페인 데이터
-    const campaigns = [
-        ['브랜드 인지도', 15200000, 42000, 580, 285],
-        ['신규 고객 확보', 12800000, 38000, 720, 356],
-        ['리타겟팅', 8500000, 28000, 890, 520],
-        ['프로모션', 10200000, 32000, 450, 278],
-        ['앱 설치', 6800000, 22000, 380, 245],
-        ['시즌 캠페인', 4880000, 15600, 286, 312]
-    ];
-
-    const stmtCampaign = db.prepare(`INSERT INTO campaigns (name, cost, clicks, conversions, roas) VALUES (?, ?, ?, ?, ?)`);
-    campaigns.forEach(row => stmtCampaign.run(row));
+    const campaignData = parseCSV(campaignCSV);
+    const stmtCampaign = db.prepare(`INSERT INTO campaigns (name, cost, clicks, impressions, conversions, revenue) VALUES (?, ?, ?, ?, ?, ?)`);
+    campaignData.forEach(row => {
+        stmtCampaign.run([row.name, row.cost, row.clicks, row.impressions || 0, row.conversions, row.revenue]);
+    });
     stmtCampaign.free();
+    console.log(`   - campaigns: ${campaignData.length} rows`);
 }
 
 function saveDatabase() {
