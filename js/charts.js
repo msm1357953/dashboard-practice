@@ -122,9 +122,9 @@ function createComparisonChart(canvasId, data) {
     if (!ctx) return null;
     if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
 
-    const metrics = ['노출수', '클릭수', '전환수', 'ROAS'];
-    const current = [data.current.impressions / 1e6, data.current.clicks / 1e3, data.current.conversions / 100, DataUtils.calculateROAS(data.current.revenue, data.current.cost) / 100];
-    const previous = [data.previous.impressions / 1e6, data.previous.clicks / 1e3, data.previous.conversions / 100, DataUtils.calculateROAS(data.previous.revenue, data.previous.cost) / 100];
+    const metrics = ['노출수', '클릭수', '전환수', '가입CPA'];
+    const current = [data.current.impressions / 1e6, data.current.clicks / 1e3, data.current.conversions / 100, DataUtils.calculateCPA(data.current.cost, data.current.conversions) / 10000];
+    const previous = [data.previous.impressions / 1e6, data.previous.clicks / 1e3, data.previous.conversions / 100, DataUtils.calculateCPA(data.previous.cost, data.previous.conversions) / 10000];
 
     chartInstances[canvasId] = new Chart(ctx, {
         type: 'bar',

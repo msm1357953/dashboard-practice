@@ -35,9 +35,9 @@ const DataUtils = {
         return (clicks / impressions * 100);
     },
 
-    calculateROAS(revenue, cost) {
-        if (cost === 0) return 0;
-        return (revenue / cost * 100);
+    calculateCPA(cost, conversions) {
+        if (conversions === 0) return 0;
+        return cost / conversions;
     }
 };
 
@@ -121,9 +121,9 @@ async function getAggregatedData(range = 14) {
                     value: stats.cost || 0,
                     change: ((1 - prevRatio) * 100).toFixed(1)
                 },
-                roas: {
-                    value: stats.roas || 0,
-                    change: '2.3'
+                cpa: {
+                    value: stats.conversions > 0 ? (stats.cost / stats.conversions) : 0,
+                    change: '-5.2'
                 }
             }
         };

@@ -28,8 +28,10 @@
         document.getElementById('kpiCost').textContent = DataUtils.formatCurrency(kpi.cost.value);
         updateChangeElement('kpiCostChange', kpi.cost.change, true);
 
-        document.getElementById('kpiRoas').textContent = kpi.roas.value.toFixed(0) + '%';
-        updateChangeElement('kpiRoasChange', kpi.roas.change);
+        // CPA 표시 (비용/전환수) - 낮을수록 좋음
+        const cpaValue = kpi.cpa?.value || 0;
+        document.getElementById('kpiCpa').textContent = DataUtils.formatCurrency(cpaValue);
+        updateChangeElement('kpiCpaChange', kpi.cpa?.change || '0', true);
     }
 
     function updateChangeElement(id, change, invertColor = false) {
