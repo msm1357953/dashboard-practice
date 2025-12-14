@@ -156,8 +156,15 @@
             defaultDate: ['2025-05-18', '2025-05-31'],
             onChange: function (selectedDates, dateStr) {
                 if (selectedDates.length === 2) {
-                    const start = selectedDates[0].toISOString().slice(0, 10);
-                    const end = selectedDates[1].toISOString().slice(0, 10);
+                    // 로컬 날짜 형식으로 변환 (UTC 시간대 문제 방지)
+                    const formatLocalDate = (date) => {
+                        const y = date.getFullYear();
+                        const m = String(date.getMonth() + 1).padStart(2, '0');
+                        const d = String(date.getDate()).padStart(2, '0');
+                        return `${y}-${m}-${d}`;
+                    };
+                    const start = formatLocalDate(selectedDates[0]);
+                    const end = formatLocalDate(selectedDates[1]);
 
                     // 프리셋 버튼 비활성화
                     document.querySelectorAll('.date-filter__btn').forEach(b => b.classList.remove('active'));
