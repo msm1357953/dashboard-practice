@@ -5,7 +5,7 @@ node_modules/
 data/*.db
 
 # Large files
-data/raw_data.csv
+data/*.csv
 MADUP_ad_raw.xlsx
 sample_check.csv
 convert_xlsx.py
