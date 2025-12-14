@@ -413,7 +413,7 @@ body::before {
 .doughnut-center {
     position: absolute;
     top: 50%;
-    left: 200px;
+    left: 28%;
     transform: translate(-50%, -50%);
     text-align: center;
     pointer-events: none;
