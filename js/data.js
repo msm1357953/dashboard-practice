@@ -114,16 +114,32 @@ const DataUtils = {
 };
 
 /**
- * API 호출 함수들 - 프로덕션이면 정적 데이터 반환
+ * API 호출 함수들 - 프로덕션이면 정적 데이터 반환 (range 필터링 적용)
  */
 async function fetchStats(range = 14) {
-    if (IS_PRODUCTION) return STATIC_DATA.stats;
+    if (IS_PRODUCTION) {
+        // range에 맞게 daily 데이터에서 stats 계산
+        const daily = STATIC_DATA.daily.slice(-range);
+        const stats = {
+            impressions: daily.reduce((s, d) => s + d.impressions, 0),
+            clicks: daily.reduce((s, d) => s + d.clicks, 0),
+            cost: daily.reduce((s, d) => s + d.cost, 0),
+            conversions: daily.reduce((s, d) => s + d.conversions, 0),
+            revenue: daily.reduce((s, d) => s + d.revenue, 0)
+        };
+        stats.ctr = stats.impressions > 0 ? (stats.clicks / stats.impressions * 100) : 0;
+        stats.roas = stats.cost > 0 ? (stats.revenue / stats.cost * 100) : 0;
+        return stats;
+    }
     const res = await fetch(`${API_BASE}/stats?range=${range}`);
     return res.json();
 }
 
 async function fetchDaily(range = 14) {
-    if (IS_PRODUCTION) return STATIC_DATA.daily;
+    if (IS_PRODUCTION) {
+        // range에 맞게 최근 N일 데이터 반환
+        return STATIC_DATA.daily.slice(-range);
+    }
     const res = await fetch(`${API_BASE}/daily?range=${range}`);
     return res.json();
 }
