@@ -431,7 +431,7 @@ body::before {
 .chart-card__body--doughnut {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     position: relative;
 }
 
@@ -439,7 +439,7 @@ body::before {
 .doughnut-center {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 30%;
     transform: translate(-50%, -50%);
     text-align: center;
     pointer-events: none;

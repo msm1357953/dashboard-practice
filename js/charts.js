@@ -78,7 +78,8 @@ function createChannelChart(canvasId, data) {
     if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
 
     const channels = data.channels;
-    const totalCost = channels.reduce((s, c) => s + c.cost, 0);
+    // 현재 기간의 총 비용 사용 (날짜 필터 반영)
+    const totalCost = data.current?.cost || channels.reduce((s, c) => s + c.cost, 0);
     const centerEl = document.getElementById('channelCenter');
     if (centerEl) centerEl.querySelector('.doughnut-center__value').textContent = DataUtils.formatCurrency(totalCost);
 
@@ -91,7 +92,10 @@ function createChannelChart(canvasId, data) {
         data: { labels: channels.map(c => c.name), datasets: [{ data: channels.map(c => c.cost), backgroundColor: bgColors, borderColor: 'rgba(15,23,42,0.8)', borderWidth: 3, hoverOffset: 8 }] },
         options: {
             responsive: true, maintainAspectRatio: false, cutout: '70%',
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${DataUtils.formatCurrency(ctx.raw)} (${((ctx.raw / totalCost) * 100).toFixed(1)}%)` } } }
+            plugins: {
+                legend: { position: 'right', labels: { padding: 12, usePointStyle: true, color: '#94A3B8', font: { size: 11 } } },
+                tooltip: { callbacks: { label: ctx => `${DataUtils.formatCurrency(ctx.raw)} (${((ctx.raw / totalCost) * 100).toFixed(1)}%)` } }
+            }
         }
     });
     return chartInstances[canvasId];
