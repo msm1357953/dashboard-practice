@@ -405,13 +405,15 @@ body::before {
 .chart-card__body--doughnut {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     position: relative;
 }
 
 /* Doughnut Center Text */
 .doughnut-center {
     position: absolute;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     pointer-events: none;

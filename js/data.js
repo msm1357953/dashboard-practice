@@ -10,16 +10,16 @@ const IS_PRODUCTION = window.location.hostname.includes('github.io') ||
     !window.location.hostname.includes('localhost');
 const API_BASE = 'http://localhost:3000/api';
 
-// GitHub Pages용 정적 데이터 (CSV에서 추출)
+// GitHub Pages용 정적 데이터 (CSV에서 추출 - 2025-05 전체)
 const STATIC_DATA = {
     stats: {
-        impressions: 965488131,
-        clicks: 12103653,
-        cost: 813408366.78,
+        impressions: 945483138,
+        clicks: 13083413,
+        cost: 813412366.78,
         conversions: 25508,
-        revenue: 1029200447.67,
-        ctr: 1.25,
-        roas: 126.52
+        revenue: 989829767.67,
+        ctr: 1.38,
+        roas: 121.68
     },
     daily: [
         { date: "2025-05-01", impressions: 13684506, clicks: 101098, cost: 13198803.74, conversions: 734, revenue: 16156756.86 },
@@ -35,7 +35,24 @@ const STATIC_DATA = {
         { date: "2025-05-11", impressions: 14456742, clicks: 252563, cost: 13941734.58, conversions: 212, revenue: 17095416.82 },
         { date: "2025-05-12", impressions: 34673225, clicks: 545996, cost: 27872495.89, conversions: 794, revenue: 33978734.65 },
         { date: "2025-05-13", impressions: 34868249, clicks: 543724, cost: 29175558.43, conversions: 742, revenue: 35672222.44 },
-        { date: "2025-05-14", impressions: 36619348, clicks: 523263, cost: 29637649.86, conversions: 938, revenue: 36175066.76 }
+        { date: "2025-05-14", impressions: 36619348, clicks: 523263, cost: 29637649.86, conversions: 938, revenue: 36175066.76 },
+        { date: "2025-05-15", impressions: 37198277, clicks: 611398, cost: 30956504.92, conversions: 982, revenue: 37674462.14 },
+        { date: "2025-05-16", impressions: 35248931, clicks: 620207, cost: 29123904.25, conversions: 727, revenue: 35608017.88 },
+        { date: "2025-05-17", impressions: 17770918, clicks: 331663, cost: 17017872.67, conversions: 393, revenue: 20701178.39 },
+        { date: "2025-05-18", impressions: 17195820, clicks: 327343, cost: 16278744.98, conversions: 408, revenue: 19839608.50 },
+        { date: "2025-05-19", impressions: 39320222, clicks: 683714, cost: 29428558.00, conversions: 652, revenue: 35747223.59 },
+        { date: "2025-05-20", impressions: 40005948, clicks: 614920, cost: 31866298.73, conversions: 855, revenue: 38713639.97 },
+        { date: "2025-05-21", impressions: 41452402, clicks: 481380, cost: 32009999.27, conversions: 941, revenue: 39033912.26 },
+        { date: "2025-05-22", impressions: 42913264, clicks: 543055, cost: 33172732.22, conversions: 827, revenue: 40391335.36 },
+        { date: "2025-05-23", impressions: 39623223, clicks: 510095, cost: 30706807.99, conversions: 736, revenue: 37562162.64 },
+        { date: "2025-05-24", impressions: 20145726, clicks: 242064, cost: 14351406.40, conversions: 569, revenue: 17258109.54 },
+        { date: "2025-05-25", impressions: 18568895, clicks: 232993, cost: 14435630.14, conversions: 625, revenue: 17346088.81 },
+        { date: "2025-05-26", impressions: 44215744, clicks: 653158, cost: 34196386.34, conversions: 1099, revenue: 41145149.51 },
+        { date: "2025-05-27", impressions: 46666249, clicks: 582625, cost: 36530691.06, conversions: 1279, revenue: 44078903.49 },
+        { date: "2025-05-28", impressions: 53245108, clicks: 632671, cost: 40094700.91, conversions: 1339, revenue: 48495036.90 },
+        { date: "2025-05-29", impressions: 65726109, clicks: 689208, cost: 52588797.20, conversions: 1652, revenue: 63638174.56 },
+        { date: "2025-05-30", impressions: 52372288, clicks: 616835, cost: 44033716.16, conversions: 1441, revenue: 53460241.71 },
+        { date: "2025-05-31", impressions: 22400453, clicks: 339577, cost: 24077600.67, conversions: 438, revenue: 29049308.13 }
     ],
     channels: [
         { id: 1, name: "몰로코", cost: 217428544, impressions: 669597184, clicks: 4948673, revenue: 275047106.23, conversions: 6801 },
@@ -51,10 +68,10 @@ const STATIC_DATA = {
     ],
     campaigns: [
         { id: 1, name: "상시", cost: 502328284.05, clicks: 5098336, impressions: 349390711, conversions: 20466, revenue: 615650108.28 },
-        { id: 2, name: "ISA", cost: 94239588.55, clicks: 2368914, impressions: 245001439, conversions: 2491, revenue: 116998018.97 },
-        { id: 3, name: "연금", cost: 74018146.18, clicks: 4361369, impressions: 104029725, conversions: 1059, revenue: 88090122.47 },
-        { id: 4, name: "해외선물", cost: 73957117, clicks: 144994, impressions: 124059999, conversions: 819, revenue: 87706495.11 },
-        { id: 5, name: "국내주식", cost: 32137347, clicks: 446888, impressions: 77276632, conversions: 380, revenue: 39184278.47 },
+        { id: 2, name: "설치 유도", cost: 94239588.55, clicks: 2368914, impressions: 245001439, conversions: 2491, revenue: 116998018.97 },
+        { id: 3, name: "가입 유도", cost: 74018146.18, clicks: 4361369, impressions: 104029725, conversions: 1059, revenue: 88090122.47 },
+        { id: 4, name: "개설 유도", cost: 73957117, clicks: 144994, impressions: 124059999, conversions: 819, revenue: 87706495.11 },
+        { id: 5, name: "매수 유도", cost: 32137347, clicks: 446888, impressions: 77276632, conversions: 380, revenue: 39184278.47 },
         { id: 6, name: "[별도] 네이버페이건", cost: 21428568, clicks: 541922, impressions: 7859994, conversions: 118, revenue: 23571424.80 },
         { id: 7, name: "공모주", cost: 15303316, clicks: 120990, impressions: 37864638, conversions: 175, revenue: 18629319.59 }
     ]

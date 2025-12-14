@@ -86,29 +86,13 @@ function createChannelChart(canvasId, data) {
     const dynamicColors = channels.map((_, i) => `hsl(${(i * 360 / channels.length + 220) % 360}, 70%, 55%)`);
     const bgColors = channels.map((c, i) => c.color || dynamicColors[i]);
 
-    // 중앙 텍스트 위치 업데이트 플러그인
-    const centerTextPlugin = {
-        id: 'centerTextPosition',
-        afterDraw: (chart) => {
-            if (centerEl) {
-                const { chartArea } = chart;
-                const centerX = (chartArea.left + chartArea.right) / 2;
-                const centerY = (chartArea.top + chartArea.bottom) / 2;
-                centerEl.style.left = centerX + 'px';
-                centerEl.style.top = centerY + 'px';
-                centerEl.style.transform = 'translate(-50%, -50%)';
-            }
-        }
-    };
-
     chartInstances[canvasId] = new Chart(ctx, {
         type: 'doughnut',
         data: { labels: channels.map(c => c.name), datasets: [{ data: channels.map(c => c.cost), backgroundColor: bgColors, borderColor: 'rgba(15,23,42,0.8)', borderWidth: 3, hoverOffset: 8 }] },
         options: {
             responsive: true, maintainAspectRatio: false, cutout: '70%',
-            plugins: { legend: { position: 'right', labels: { padding: 16, usePointStyle: true } }, tooltip: { callbacks: { label: ctx => `${DataUtils.formatCurrency(ctx.raw)} (${((ctx.raw / totalCost) * 100).toFixed(1)}%)` } } }
-        },
-        plugins: [centerTextPlugin]
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${DataUtils.formatCurrency(ctx.raw)} (${((ctx.raw / totalCost) * 100).toFixed(1)}%)` } } }
+        }
     });
     return chartInstances[canvasId];
 }

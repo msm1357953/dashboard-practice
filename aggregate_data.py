@@ -4,7 +4,7 @@ ads_cost_raw_202505.csv.gz를 집계하여 대시보드용 CSV 3개 생성
 import pandas as pd
 import os
 
-GZ_FILE = 'ads_cost_raw_202505.csv.gz'
+GZ_FILE = 'data/ads_cost_raw_202505.csv.gz'
 
 # 컬럼 매핑 (gz -> 내부명)
 COL_MAP = {
