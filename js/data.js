@@ -74,6 +74,58 @@ const STATIC_DATA = {
         { id: 5, name: "매수 유도", cost: 32137347, clicks: 446888, impressions: 77276632, conversions: 380, revenue: 39184278.47 },
         { id: 6, name: "[별도] 네이버페이건", cost: 21428568, clicks: 541922, impressions: 7859994, conversions: 118, revenue: 23571424.80 },
         { id: 7, name: "공모주", cost: 15303316, clicks: 120990, impressions: 37864638, conversions: 175, revenue: 18629319.59 }
+    ],
+    // 일별 캠페인 데이터 (daily_campaign.csv 기반)
+    dailyCampaign: [
+        { date: "2025-05-01", name: "상시", impressions: 6618675, clicks: 54881, cost: 10928104.26, conversions: 629 },
+        { date: "2025-05-01", name: "설치 유도", impressions: 3845116, clicks: 40875, cost: 1249054.48, conversions: 59 },
+        { date: "2025-05-01", name: "개설 유도", impressions: 1702233, clicks: 1306, cost: 520328, conversions: 31 },
+        { date: "2025-05-01", name: "매수 유도", impressions: 1518482, clicks: 4036, cost: 501317, conversions: 15 },
+        { date: "2025-05-02", name: "상시", impressions: 9402468, clicks: 106250, cost: 14515565.99, conversions: 752 },
+        { date: "2025-05-02", name: "설치 유도", impressions: 6682801, clicks: 66398, cost: 2274951.29, conversions: 104 },
+        { date: "2025-05-02", name: "개설 유도", impressions: 1500827, clicks: 1192, cost: 567764, conversions: 12 },
+        { date: "2025-05-02", name: "매수 유도", impressions: 2944027, clicks: 9989, cost: 918900, conversions: 25 },
+        { date: "2025-05-07", name: "상시", impressions: 13918923, clicks: 191742, cost: 24998485.63, conversions: 1102 },
+        { date: "2025-05-07", name: "설치 유도", impressions: 9232306, clicks: 85956, cost: 3646785.75, conversions: 186 },
+        { date: "2025-05-07", name: "가입 유도", impressions: 3935468, clicks: 211486, cost: 3557153.93, conversions: 23 },
+        { date: "2025-05-07", name: "개설 유도", impressions: 2194799, clicks: 2385, cost: 1081397, conversions: 41 },
+        { date: "2025-05-07", name: "매수 유도", impressions: 2691671, clicks: 11997, cost: 1270346, conversions: 32 },
+        { date: "2025-05-14", name: "상시", impressions: 13503190, clicks: 216073, cost: 17639895.03, conversions: 725 },
+        { date: "2025-05-14", name: "설치 유도", impressions: 11557398, clicks: 95638, cost: 4369699.19, conversions: 119 },
+        { date: "2025-05-14", name: "가입 유도", impressions: 5305634, clicks: 192367, cost: 3718970.18, conversions: 46 },
+        { date: "2025-05-14", name: "개설 유도", impressions: 3900325, clicks: 4963, cost: 2460566.46, conversions: 31 },
+        { date: "2025-05-14", name: "매수 유도", impressions: 2352801, clicks: 14222, cost: 1448519, conversions: 17 },
+        { date: "2025-05-21", name: "상시", impressions: 14814354, clicks: 142724, cost: 18317371.62, conversions: 736 },
+        { date: "2025-05-21", name: "설치 유도", impressions: 11310516, clicks: 106311, cost: 4321267.10, conversions: 96 },
+        { date: "2025-05-21", name: "가입 유도", impressions: 5514710, clicks: 205150, cost: 3824754.09, conversions: 59 },
+        { date: "2025-05-21", name: "개설 유도", impressions: 6161621, clicks: 7072, cost: 4079619.46, conversions: 32 },
+        { date: "2025-05-21", name: "매수 유도", impressions: 3651201, clicks: 20123, cost: 1466987, conversions: 18 },
+        { date: "2025-05-28", name: "상시", impressions: 18032902, clicks: 181766, cost: 20230265.78, conversions: 1050 },
+        { date: "2025-05-28", name: "설치 유도", impressions: 10305005, clicks: 91498, cost: 4501675.56, conversions: 123 },
+        { date: "2025-05-28", name: "가입 유도", impressions: 4851603, clicks: 226423, cost: 3401756.12, conversions: 64 },
+        { date: "2025-05-28", name: "개설 유도", impressions: 7524844, clicks: 8253, cost: 4224821.46, conversions: 51 },
+        { date: "2025-05-28", name: "매수 유도", impressions: 4295834, clicks: 15047, cost: 1539625, conversions: 16 },
+        { date: "2025-05-28", name: "공모주", impressions: 7029921, clicks: 18899, cost: 2625128, conversions: 13 },
+        { date: "2025-05-28", name: "[별도] 네이버페이건", impressions: 1204999, clicks: 90785, cost: 3571429, conversions: 22 },
+        { date: "2025-05-29", name: "상시", impressions: 17498648, clicks: 196642, cost: 25078085.16, conversions: 1313 },
+        { date: "2025-05-29", name: "설치 유도", impressions: 8835914, clicks: 90306, cost: 4468833.46, conversions: 103 },
+        { date: "2025-05-29", name: "가입 유도", impressions: 4610283, clicks: 230572, cost: 4152976.12, conversions: 65 },
+        { date: "2025-05-29", name: "개설 유도", impressions: 7915975, clicks: 8555, cost: 4215614.46, conversions: 47 },
+        { date: "2025-05-29", name: "매수 유도", impressions: 3837803, clicks: 22114, cost: 1754884, conversions: 13 },
+        { date: "2025-05-29", name: "공모주", impressions: 21874578, clicks: 73068, cost: 9346975, conversions: 87 },
+        { date: "2025-05-29", name: "[별도] 네이버페이건", impressions: 1152908, clicks: 67951, cost: 3571429, conversions: 24 },
+        { date: "2025-05-30", name: "상시", impressions: 16870534, clicks: 176351, cost: 24295987.67, conversions: 1128 },
+        { date: "2025-05-30", name: "설치 유도", impressions: 8832627, clicks: 89825, cost: 3990556.92, conversions: 97 },
+        { date: "2025-05-30", name: "가입 유도", impressions: 4172669, clicks: 214949, cost: 3298609.12, conversions: 58 },
+        { date: "2025-05-30", name: "개설 유도", impressions: 8770252, clicks: 8673, cost: 4145359.46, conversions: 38 },
+        { date: "2025-05-30", name: "매수 유도", impressions: 3531301, clicks: 19844, cost: 1400561, conversions: 18 },
+        { date: "2025-05-30", name: "공모주", impressions: 8960138, clicks: 29023, cost: 3331213, conversions: 66 },
+        { date: "2025-05-30", name: "[별도] 네이버페이건", impressions: 1234767, clicks: 78170, cost: 3571429, conversions: 36 },
+        { date: "2025-05-31", name: "상시", impressions: 9163125, clicks: 120570, cost: 15131659.44, conversions: 338 },
+        { date: "2025-05-31", name: "설치 유도", impressions: 4522230, clicks: 52461, cost: 1730272.65, conversions: 53 },
+        { date: "2025-05-31", name: "가입 유도", impressions: 1936490, clicks: 73017, cost: 1017499.12, conversions: 16 },
+        { date: "2025-05-31", name: "개설 유도", impressions: 5541325, clicks: 5773, cost: 2626739.46, conversions: 13 },
+        { date: "2025-05-31", name: "[별도] 네이버페이건", impressions: 1237282, clicks: 87756, cost: 3571429, conversions: 8 }
     ]
 };
 
@@ -88,8 +140,8 @@ const DataUtils = {
     },
 
     formatCurrency(num) {
-        if (num >= 100000000) return '₩' + (num / 100000000).toFixed(1) + '억';
-        if (num >= 10000) return '₩' + (num / 10000).toFixed(0) + '만';
+        if (num >= 100000000) return '₩' + (num / 100000000).toFixed(2) + '억';
+        if (num >= 10000) return '₩' + (num / 10000).toFixed(2) + '만';
         return '₩' + num.toLocaleString();
     },
 
@@ -174,6 +226,26 @@ function calculateStatsFromDaily(daily) {
     stats.ctr = stats.impressions > 0 ? (stats.clicks / stats.impressions * 100) : 0;
     stats.roas = stats.cost > 0 ? (stats.revenue / stats.cost * 100) : 0;
     return stats;
+}
+
+/**
+ * 날짜 범위로 캠페인 데이터 집계 (startDate, endDate: 'YYYY-MM-DD' 형식)
+ */
+function aggregateCampaignsByDateRange(startDate, endDate) {
+    const filtered = STATIC_DATA.dailyCampaign.filter(d => d.date >= startDate && d.date <= endDate);
+    const campaignMap = {};
+
+    filtered.forEach(d => {
+        if (!campaignMap[d.name]) {
+            campaignMap[d.name] = { name: d.name, impressions: 0, clicks: 0, cost: 0, conversions: 0 };
+        }
+        campaignMap[d.name].impressions += d.impressions;
+        campaignMap[d.name].clicks += d.clicks;
+        campaignMap[d.name].cost += d.cost;
+        campaignMap[d.name].conversions += d.conversions;
+    });
+
+    return Object.values(campaignMap).sort((a, b) => b.cost - a.cost);
 }
 
 /**

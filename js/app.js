@@ -67,6 +67,7 @@
         try {
             const daily = filterDailyByDateRange(startDate, endDate);
             const stats = calculateStatsFromDaily(daily);
+            const campaigns = aggregateCampaignsByDateRange(startDate, endDate);
             const prevRatio = 0.9;
 
             currentData = {
@@ -93,7 +94,7 @@
                     revenue: d.revenue
                 })),
                 channels: STATIC_DATA.channels,
-                campaigns: STATIC_DATA.campaigns,
+                campaigns: campaigns,
                 kpi: {
                     impressions: { value: stats.impressions, change: '10.0' },
                     clicks: { value: stats.clicks, change: '10.0' },

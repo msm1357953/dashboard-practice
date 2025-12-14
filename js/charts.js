@@ -77,26 +77,51 @@ function createChannelChart(canvasId, data) {
     if (!ctx) return null;
     if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
 
-    const channels = data.channels;
-    // 현재 기간의 총 비용 사용 (날짜 필터 반영)
-    const totalCost = data.current?.cost || channels.reduce((s, c) => s + c.cost, 0);
-    const centerEl = document.getElementById('channelCenter');
-    if (centerEl) centerEl.querySelector('.doughnut-center__value').textContent = DataUtils.formatCurrency(totalCost);
+    // 비용 기준 정렬 (전체 매체 표시)
+    const displayChannels = [...data.channels].sort((a, b) => b.cost - a.cost);
 
-    // 동적 색상 생성 (color 컬럼이 없을 경우)
-    const dynamicColors = channels.map((_, i) => `hsl(${(i * 360 / channels.length + 220) % 360}, 70%, 55%)`);
-    const bgColors = channels.map((c, i) => c.color || dynamicColors[i]);
+    // 현재 기간의 총 비용 사용 (날짜 필터 반영)
+    const totalCost = data.current?.cost || displayChannels.reduce((s, c) => s + c.cost, 0);
+    const centerText = DataUtils.formatCurrency(totalCost);
+
+    // 고정 색상 팔레트 (10개)
+    const fixedColors = ['#F97316', '#FB923C', '#FBBF24', '#14B8A6', '#3B82F6', '#8B5CF6', '#EC4899', '#EF4444', '#06B6D4', '#94A3B8'];
+    const bgColors = displayChannels.map((_, i) => fixedColors[i % fixedColors.length]);
+
+    // 중앙 텍스트 플러그인
+    const centerTextPlugin = {
+        id: 'centerText',
+        afterDraw: function (chart) {
+            const { ctx, chartArea } = chart;
+            const centerX = (chartArea.left + chartArea.right) / 2;
+            const centerY = (chartArea.top + chartArea.bottom) / 2;
+
+            ctx.save();
+            // 비용 값
+            ctx.font = 'bold 1.5rem Inter, sans-serif';
+            ctx.fillStyle = '#F8FAFC';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(centerText, centerX, centerY - 10);
+            // 라벨
+            ctx.font = '0.75rem Inter, sans-serif';
+            ctx.fillStyle = '#94A3B8';
+            ctx.fillText('총 비용', centerX, centerY + 15);
+            ctx.restore();
+        }
+    };
 
     chartInstances[canvasId] = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels: channels.map(c => c.name), datasets: [{ data: channels.map(c => c.cost), backgroundColor: bgColors, borderColor: 'rgba(15,23,42,0.8)', borderWidth: 3, hoverOffset: 8 }] },
+        data: { labels: displayChannels.map(c => c.name), datasets: [{ data: displayChannels.map(c => c.cost), backgroundColor: bgColors, borderColor: 'rgba(15,23,42,0.8)', borderWidth: 3, hoverOffset: 8 }] },
         options: {
             responsive: true, maintainAspectRatio: false, cutout: '70%',
             plugins: {
                 legend: { position: 'right', labels: { padding: 12, usePointStyle: true, color: '#94A3B8', font: { size: 11 } } },
                 tooltip: { callbacks: { label: ctx => `${DataUtils.formatCurrency(ctx.raw)} (${((ctx.raw / totalCost) * 100).toFixed(1)}%)` } }
             }
-        }
+        },
+        plugins: [centerTextPlugin]
     });
     return chartInstances[canvasId];
 }
@@ -126,14 +151,65 @@ function createComparisonChart(canvasId, data) {
     if (!ctx) return null;
     if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
 
+    // 원본 값 저장 (툴팁용)
+    const rawCurrent = {
+        impressions: data.current.impressions,
+        clicks: data.current.clicks,
+        conversions: data.current.conversions,
+        cpa: DataUtils.calculateCPA(data.current.cost, data.current.conversions)
+    };
+    const rawPrevious = {
+        impressions: data.previous.impressions,
+        clicks: data.previous.clicks,
+        conversions: data.previous.conversions,
+        cpa: DataUtils.calculateCPA(data.previous.cost, data.previous.conversions)
+    };
+
+    // 정규화: 각 지표의 현재값을 100%로 설정
     const metrics = ['노출수', '클릭수', '전환수', '가입CPA'];
-    const current = [data.current.impressions / 1e6, data.current.clicks / 1e3, data.current.conversions / 100, DataUtils.calculateCPA(data.current.cost, data.current.conversions) / 10000];
-    const previous = [data.previous.impressions / 1e6, data.previous.clicks / 1e3, data.previous.conversions / 100, DataUtils.calculateCPA(data.previous.cost, data.previous.conversions) / 10000];
+    const metricKeys = ['impressions', 'clicks', 'conversions', 'cpa'];
+
+    const current = metricKeys.map(k => 100); // 현재 = 100%
+    const previous = metricKeys.map(k => {
+        const curr = rawCurrent[k] || 1;
+        const prev = rawPrevious[k] || 0;
+        return (prev / curr) * 100;
+    });
 
     chartInstances[canvasId] = new Chart(ctx, {
         type: 'bar',
-        data: { labels: metrics, datasets: [{ label: '현재 기간', data: current, backgroundColor: CHART_COLORS.primary, borderRadius: 6 }, { label: '이전 기간', data: previous, backgroundColor: 'rgba(148,163,184,0.3)', borderRadius: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', align: 'end' } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(148,163,184,0.08)' } } } }
+        data: {
+            labels: metrics,
+            datasets: [
+                { label: '현재 기간', data: current, backgroundColor: CHART_COLORS.primary, borderRadius: 6 },
+                { label: '이전 기간', data: previous, backgroundColor: 'rgba(148,163,184,0.3)', borderRadius: 6 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', align: 'end' },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const idx = context.dataIndex;
+                            const key = metricKeys[idx];
+                            const val = context.datasetIndex === 0 ? rawCurrent[key] : rawPrevious[key];
+                            if (key === 'cpa') return `${context.dataset.label}: ${DataUtils.formatCurrency(val)}`;
+                            return `${context.dataset.label}: ${DataUtils.formatNumber(val)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    grid: { color: 'rgba(148,163,184,0.08)' },
+                    ticks: { callback: v => v + '%' },
+                    max: 120
+                }
+            }
+        }
     });
     return chartInstances[canvasId];
 }

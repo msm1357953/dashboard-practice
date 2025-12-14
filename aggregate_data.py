@@ -68,7 +68,7 @@ print(f"   -> data/channel_summary.csv ({len(channels)} rows)")
 # ============================================
 # 3. 캠페인별 집계 (campaign_summary.csv)
 # ============================================
-print("\n[4/4] 캠페인별 집계 중...")
+print("\n[4/5] 캠페인별 집계 중...")
 campaigns = df.groupby('campaign').agg({
     'impressions': 'sum',
     'clicks': 'sum',
@@ -83,12 +83,30 @@ campaigns.to_csv('data/campaign_summary.csv', index=False, encoding='utf-8')
 print(f"   -> data/campaign_summary.csv ({len(campaigns)} rows)")
 
 # ============================================
+# 4. 일별+캠페인 집계 (daily_campaign.csv)
+# ============================================
+print("\n[5/5] 일별+캠페인 집계 중...")
+daily_campaign = df.groupby(['date', 'campaign']).agg({
+    'impressions': 'sum',
+    'clicks': 'sum',
+    'cost': 'sum',
+    'revenue': 'sum',
+    'conversions': 'sum'
+}).reset_index()
+
+daily_campaign['date'] = daily_campaign['date'].dt.strftime('%Y-%m-%d')
+daily_campaign.columns = ['date', 'name', 'impressions', 'clicks', 'cost', 'revenue', 'conversions']
+daily_campaign.to_csv('data/daily_campaign.csv', index=False, encoding='utf-8')
+print(f"   -> data/daily_campaign.csv ({len(daily_campaign)} rows)")
+
+# ============================================
 # 파일 크기 확인
 # ============================================
 print("\n[DONE] 생성된 파일:")
-for f in ['daily_summary.csv', 'channel_summary.csv', 'campaign_summary.csv']:
+for f in ['daily_summary.csv', 'channel_summary.csv', 'campaign_summary.csv', 'daily_campaign.csv']:
     path = f'data/{f}'
     size = os.path.getsize(path) / 1024
     print(f"   {f}: {size:.1f} KB")
 
 print("\nAll done!")
+
