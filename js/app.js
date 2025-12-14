@@ -9,6 +9,8 @@
     let currentData = null;
     let trendMetrics = ['impressions', 'clicks'];
     let campaignMetric = 'cost';
+    let datePickerInstance = null;
+    let customDateRange = null; // { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' }
 
     /**
      * KPI 카드 업데이트
@@ -45,17 +47,67 @@
         el.className = 'kpi-card__change ' + (displayPositive ? 'positive' : 'negative');
     }
 
-    function updateDatePeriod(data) {
-        // API에서 반환된 일별 데이터의 실제 날짜 범위 사용
+    function updateDatePickerDisplay(data) {
         const daily = data.daily;
         if (!daily || daily.length === 0) return;
 
         const startDate = daily[0].date;
         const endDate = daily[daily.length - 1].date;
 
-        // YYYY-MM-DD -> YYYY.MM.DD 포맷 변환
-        const format = (dateStr) => dateStr.replace(/-/g, '.');
-        document.getElementById('datePeriod').textContent = `${format(startDate)} - ${format(endDate)}`;
+        // flatpickr 인스턴스 날짜 업데이트
+        if (datePickerInstance) {
+            datePickerInstance.setDate([startDate, endDate], false);
+        }
+    }
+
+    /**
+     * 커스텀 날짜 범위로 데이터 로드
+     */
+    async function loadDataByDateRange(startDate, endDate) {
+        try {
+            const daily = filterDailyByDateRange(startDate, endDate);
+            const stats = calculateStatsFromDaily(daily);
+            const prevRatio = 0.9;
+
+            currentData = {
+                current: {
+                    impressions: stats.impressions,
+                    clicks: stats.clicks,
+                    cost: stats.cost,
+                    conversions: stats.conversions,
+                    revenue: stats.revenue
+                },
+                previous: {
+                    impressions: Math.round(stats.impressions * prevRatio),
+                    clicks: Math.round(stats.clicks * prevRatio),
+                    cost: Math.round(stats.cost * prevRatio),
+                    conversions: Math.round(stats.conversions * prevRatio),
+                    revenue: Math.round(stats.revenue * prevRatio)
+                },
+                daily: daily.map(d => ({
+                    date: d.date.slice(5).replace('-', '/'),
+                    impressions: d.impressions,
+                    clicks: d.clicks,
+                    cost: d.cost,
+                    conversions: d.conversions,
+                    revenue: d.revenue
+                })),
+                channels: STATIC_DATA.channels,
+                campaigns: STATIC_DATA.campaigns,
+                kpi: {
+                    impressions: { value: stats.impressions, change: '10.0' },
+                    clicks: { value: stats.clicks, change: '10.0' },
+                    ctr: { value: stats.ctr, change: '0.5' },
+                    cost: { value: stats.cost, change: '10.0' },
+                    cpa: { value: stats.conversions > 0 ? (stats.cost / stats.conversions) : 0, change: '-5.2' }
+                }
+            };
+
+            updateKPICards(currentData);
+            updateAllCharts(currentData, { trendMetrics, campaignMetric });
+        } catch (error) {
+            console.error('날짜 범위 데이터 로드 실패:', error);
+        }
     }
 
     /**
@@ -65,7 +117,7 @@
         try {
             currentData = await getAggregatedData(currentRange);
             updateKPICards(currentData);
-            updateDatePeriod(currentData);
+            updateDatePickerDisplay(currentData);
             updateAllCharts(currentData, { trendMetrics, campaignMetric });
         } catch (error) {
             console.error('대시보드 초기화 실패:', error);
@@ -78,13 +130,43 @@
      */
     async function refreshData() {
         try {
+            customDateRange = null; // 프리셋 버튼 클릭 시 커스텀 범위 초기화
             currentData = await getAggregatedData(currentRange);
             updateKPICards(currentData);
-            updateDatePeriod(currentData);
+            updateDatePickerDisplay(currentData);
             updateAllCharts(currentData, { trendMetrics, campaignMetric });
         } catch (error) {
             console.error('데이터 새로고침 실패:', error);
         }
+    }
+
+    /**
+     * flatpickr 날짜 선택기 초기화
+     */
+    function initDatePicker() {
+        const input = document.getElementById('dateRangePicker');
+        if (!input || typeof flatpickr === 'undefined') return;
+
+        datePickerInstance = flatpickr(input, {
+            mode: 'range',
+            dateFormat: 'Y.m.d',
+            locale: 'ko',
+            maxDate: '2025-05-31',
+            minDate: '2025-05-01',
+            defaultDate: ['2025-05-18', '2025-05-31'],
+            onChange: function (selectedDates, dateStr) {
+                if (selectedDates.length === 2) {
+                    const start = selectedDates[0].toISOString().slice(0, 10);
+                    const end = selectedDates[1].toISOString().slice(0, 10);
+
+                    // 프리셋 버튼 비활성화
+                    document.querySelectorAll('.date-filter__btn').forEach(b => b.classList.remove('active'));
+
+                    customDateRange = { start, end };
+                    loadDataByDateRange(start, end);
+                }
+            }
+        });
     }
 
     /**
@@ -126,5 +208,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         initDashboard();
         setupEventListeners();
+        initDatePicker();
     });
 })();
+

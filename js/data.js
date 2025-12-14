@@ -157,6 +157,26 @@ async function fetchCampaigns() {
 }
 
 /**
+ * 날짜 범위로 데이터 필터링 (startDate, endDate: 'YYYY-MM-DD' 형식)
+ */
+function filterDailyByDateRange(startDate, endDate) {
+    return STATIC_DATA.daily.filter(d => d.date >= startDate && d.date <= endDate);
+}
+
+function calculateStatsFromDaily(daily) {
+    const stats = {
+        impressions: daily.reduce((s, d) => s + d.impressions, 0),
+        clicks: daily.reduce((s, d) => s + d.clicks, 0),
+        cost: daily.reduce((s, d) => s + d.cost, 0),
+        conversions: daily.reduce((s, d) => s + d.conversions, 0),
+        revenue: daily.reduce((s, d) => s + d.revenue, 0)
+    };
+    stats.ctr = stats.impressions > 0 ? (stats.clicks / stats.impressions * 100) : 0;
+    stats.roas = stats.cost > 0 ? (stats.revenue / stats.cost * 100) : 0;
+    return stats;
+}
+
+/**
  * 통합 데이터 가져오기 (기존 getAggregatedData 대체)
  */
 async function getAggregatedData(range = 14) {

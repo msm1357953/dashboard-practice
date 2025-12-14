@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -38,8 +40,8 @@
                     <button class="date-filter__btn active" data-range="14">14일</button>
                     <button class="date-filter__btn" data-range="30">30일</button>
                 </div>
-                <div class="header__period" id="datePeriod">
-                    로딩 중...
+                <div class="date-picker-wrap">
+                    <input type="text" id="dateRangePicker" class="date-picker" placeholder="날짜 선택">
                 </div>
             </div>
         </header>
@@ -195,6 +197,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
     <script src="js/data.js"></script>
     <script src="js/charts.js"></script>
     <script src="js/app.js"></script>
